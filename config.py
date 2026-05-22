@@ -47,8 +47,8 @@ VIDEO_BITRATE = "4000k"
 
 # TTS settings — downer female voice
 TTS_VOICE = "ja-JP-KeitaNeural"
-TTS_RATE = "-14%"
-TTS_PITCH = "-28Hz"
+TTS_RATE = "-10%"
+TTS_PITCH = "-20Hz"
 TTS_VOLUME = "+0%"
 
 # Channel identity

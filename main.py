@@ -41,6 +41,10 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
         return {"script": script, "session_dir": str(session_dir)}
 
     # 2. Generate TTS audio
+    # アウトロを強制固定（どんな場合も上書き）
+    for scene in script.get("scenes", []):
+        if scene.get("type") == "outro":
+            scene["narration"] = "ぜひチャンネル登録をして、次の言葉もお聞きください。"
     print("[pipeline] Generating TTS audio...")
     scenes = script["scenes"]
     audio_paths = generate_scene_audios(scenes, session_dir)

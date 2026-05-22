@@ -69,7 +69,8 @@ USER_PROMPT_TEMPLATE = """以下のギリシャ語単語について、YouTube S
 - intro: 60〜80文字（約8秒）
 - word: 50〜70文字（約9秒）
 - meaning: 150〜180文字（約25秒）
-- outro: 50〜65文字（約8秒）
+- outro: 固定テキストを使用（下記参照）
+3. ナレーションは自然な話し言葉で書いてください。書き言葉ではなく、実際に人が語りかけるような口調にしてください。適切な場所に読点（、）を使って自然な間を作ってください。
 
 以下のJSON構造で脚本を返してください:
 
@@ -100,7 +101,7 @@ USER_PROMPT_TEMPLATE = """以下のギリシャ語単語について、YouTube S
     }},
     {{
       "type": "outro",
-      "narration": "チャンネル「古典ギリシャの美」では、毎日一つ、古代の言葉をお届けします。チャンネル登録でお待ちしています。"
+      "narration": "ぜひチャンネル登録をして、次の言葉もお聞きください。"
     }}
   ]
 }}"""
@@ -154,4 +155,9 @@ def generate_script(topic: dict | None = None) -> dict:
 
     script = json.loads(raw)
     script["_topic"] = topic
+
+    # 〆の言葉を強制固定
+    for scene in script.get("scenes", []):
+        if scene.get("type") == "outro":
+            scene["narration"] = "ぜひチャンネル登録をして、次の言葉もお聞きください。"
     return script
