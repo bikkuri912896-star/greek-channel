@@ -1,0 +1,22 @@
+# Secrets (never commit these!)
+.env
+client_secrets.json
+youtube_token.json
+
+# Generated content (too large for git)
+sessions/
+output/
+.cache/
+assets/bgm/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+.venv/

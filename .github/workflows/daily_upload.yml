@@ -1,0 +1,50 @@
+name: Daily Greek Video Upload
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 毎日 00:00 UTC = 09:00 JST
+  workflow_dispatch:        # 手動実行ボタン（テスト用）
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # used_topics.json をコミットするために必要
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up credentials
+        run: |
+          echo '${{ secrets.YOUTUBE_CLIENT_SECRETS }}' > client_secrets.json
+          echo '${{ secrets.YOUTUBE_TOKEN }}'          > youtube_token.json
+          printf 'ANTHROPIC_API_KEY=%s\n' '${{ secrets.ANTHROPIC_API_KEY }}' > .env
+
+      - name: Generate and upload video
+        run: python main.py
+        env:
+          PYTHONIOENCODING: utf-8
+
+      - name: Save updated topic list
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add used_topics.json
+          git diff --staged --quiet || git commit -m "chore: update used topics [skip ci]"
+          git push
