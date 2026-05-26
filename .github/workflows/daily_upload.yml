@@ -37,11 +37,17 @@ jobs:
           printf 'ANTHROPIC_API_KEY=%s\n' '${{ secrets.ANTHROPIC_API_KEY }}' > .env
           printf 'INSTAGRAM_ACCESS_TOKEN=%s\n' '${{ secrets.INSTAGRAM_ACCESS_TOKEN }}' >> .env
           printf 'INSTAGRAM_ACCOUNT_ID=%s\n' '${{ secrets.INSTAGRAM_ACCOUNT_ID }}' >> .env
+          printf 'CLOUDINARY_CLOUD_NAME=%s\n' '${{ secrets.CLOUDINARY_CLOUD_NAME }}' >> .env
+          printf 'CLOUDINARY_API_KEY=%s\n' '${{ secrets.CLOUDINARY_API_KEY }}' >> .env
+          printf 'CLOUDINARY_API_SECRET=%s\n' '${{ secrets.CLOUDINARY_API_SECRET }}' >> .env
 
       - name: Generate and upload video
         run: python main.py
         env:
           PYTHONIOENCODING: utf-8
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
 
       - name: Save updated topic list
         run: |

@@ -2,7 +2,10 @@ import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 import time
+import os
 import requests
+import cloudinary
+import cloudinary.uploader
 from pathlib import Path
 import config
 
@@ -10,37 +13,21 @@ GRAPH_URL = "https://graph.instagram.com/v21.0"
 
 
 def _host_video(video_path: Path) -> str:
-    """動画を一時的な公開ホスティングサービスにアップロードしてURLを返す。"""
-    print("[instagram] Hosting video publicly...")
-
-    # catbox.moe（無料・永続・アカウント不要）
-    try:
-        with open(video_path, "rb") as f:
-            resp = requests.post(
-                "https://catbox.moe/user/api.php",
-                data={"reqtype": "fileupload"},
-                files={"fileToUpload": (video_path.name, f, "video/mp4")},
-                timeout=180,
-            )
-        resp.raise_for_status()
-        url = resp.text.strip()
-        if url.startswith("https://"):
-            print(f"[instagram] Hosted at: {url}")
-            return url
-    except Exception as e:
-        print(f"[instagram] catbox.moe failed: {e}")
-
-    # litterbox.catbox.moe（72時間有効・フォールバック）
-    with open(video_path, "rb") as f:
-        resp = requests.post(
-            "https://litterbox.catbox.moe/resources/internalpages/internals.php",
-            data={"reqtype": "fileupload", "time": "72h"},
-            files={"fileToUpload": (video_path.name, f, "video/mp4")},
-            timeout=180,
-        )
-    resp.raise_for_status()
-    url = resp.text.strip()
-    print(f"[instagram] Hosted at (litterbox): {url}")
+    """Cloudinaryに動画をアップロードして公開URLを返す。"""
+    print("[instagram] Uploading video to Cloudinary...")
+    cloudinary.config(
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+        api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET", ""),
+    )
+    result = cloudinary.uploader.upload(
+        str(video_path),
+        resource_type="video",
+        public_id=f"greek-{video_path.stem}",
+        overwrite=True,
+    )
+    url = result["secure_url"]
+    print(f"[instagram] Hosted at: {url}")
     return url
 
 
