@@ -9,6 +9,22 @@ import config
 GRAPH_URL = "https://graph.instagram.com/v21.0"
 
 
+def _host_video(video_path: Path) -> str:
+    """動画を一時的な公開ホスティングサービスにアップロードしてURLを返す。"""
+    print("[instagram] Hosting video publicly...")
+    with open(video_path, "rb") as f:
+        resp = requests.put(
+            f"https://transfer.sh/{video_path.name}",
+            data=f,
+            headers={"Max-Days": "1", "Max-Downloads": "20"},
+            timeout=120,
+        )
+    resp.raise_for_status()
+    url = resp.text.strip()
+    print(f"[instagram] Hosted at: {url}")
+    return url
+
+
 def upload_reel(video_path: Path, script: dict) -> str:
     """Upload a video as an Instagram Reel. Returns the media ID."""
     token   = config.INSTAGRAM_ACCESS_TOKEN
@@ -19,50 +35,33 @@ def upload_reel(video_path: Path, script: dict) -> str:
     tags        = " ".join(f"#{t.replace(' ', '')}" for t in script.get("tags", []))
     caption     = f"{title}\n\n{description}\n\n{tags}"
 
-    file_size = video_path.stat().st_size
+    # Step 1: Host video at a public URL
+    video_url = _host_video(video_path)
 
-    # Step 1: Create resumable upload container
+    # Step 2: Create media container
     print("[instagram] Creating media container...")
     resp = requests.post(
         f"{GRAPH_URL}/{user_id}/media",
         data={
             "media_type":  "REELS",
-            "upload_type": "resumable",
+            "video_url":   video_url,
             "caption":     caption,
             "access_token": token,
-        }
+        },
+        timeout=30,
     )
     if not resp.ok:
         print(f"[instagram] Error response: {resp.text}")
     resp.raise_for_status()
-    data = resp.json()
-    container_id = data["id"]
-    upload_url   = data["upload_url"]
+    container_id = resp.json()["id"]
     print(f"[instagram] Container ID: {container_id}")
-
-    # Step 2: Upload video file
-    print("[instagram] Uploading video...")
-    with open(video_path, "rb") as f:
-        video_data = f.read()
-
-    upload_resp = requests.post(
-        upload_url,
-        headers={
-            "Authorization": f"OAuth {token}",
-            "offset":        "0",
-            "file_size":     str(file_size),
-        },
-        data=video_data,
-    )
-    upload_resp.raise_for_status()
-    print("[instagram] Upload complete.")
 
     # Step 3: Wait for processing
     print("[instagram] Waiting for processing...")
     for i in range(30):
         status_resp = requests.get(
             f"{GRAPH_URL}/{container_id}",
-            params={"fields": "status_code", "access_token": token}
+            params={"fields": "status_code", "access_token": token},
         )
         status = status_resp.json().get("status_code", "")
         print(f"[instagram] Status: {status}")
@@ -79,7 +78,8 @@ def upload_reel(video_path: Path, script: dict) -> str:
         params={
             "creation_id":  container_id,
             "access_token": token,
-        }
+        },
+        timeout=30,
     )
     pub_resp.raise_for_status()
     media_id = pub_resp.json()["id"]
