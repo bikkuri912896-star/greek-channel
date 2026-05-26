@@ -16,6 +16,7 @@ from modules.image_fetcher import fetch_images
 from modules.video_creator import create_video
 from modules.bgm_generator import generate_ambient_bgm
 from modules.youtube_uploader import upload_video
+from modules.instagram_uploader import upload_reel
 
 
 def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool = False) -> dict:
@@ -41,10 +42,6 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
         return {"script": script, "session_dir": str(session_dir)}
 
     # 2. Generate TTS audio
-    # アウトロを強制固定（どんな場合も上書き）
-    for scene in script.get("scenes", []):
-        if scene.get("type") == "outro":
-            scene["narration"] = "ぜひチャンネル登録をして、次の言葉もお聞きください。"
     print("[pipeline] Generating TTS audio...")
     scenes = script["scenes"]
     audio_paths = generate_scene_audios(scenes, session_dir)
@@ -82,7 +79,21 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
         video_id = upload_video(output_video, script)
         result["youtube_id"] = video_id
         result["youtube_url"] = f"https://youtube.com/watch?v={video_id}"
-        print(f"[pipeline] Done! {result['youtube_url']}")
+        print(f"[pipeline] YouTube: {result['youtube_url']}")
+
+        # 6. Upload to Instagram
+        if config.INSTAGRAM_ACCESS_TOKEN:
+            print("[pipeline] Uploading to Instagram...")
+            try:
+                media_id = upload_reel(output_video, script)
+                result["instagram_id"] = media_id
+                print(f"[pipeline] Instagram: {media_id}")
+            except Exception as e:
+                print(f"[pipeline] Instagram upload failed: {e}")
+        else:
+            print("[pipeline] Instagram token not set, skipping.")
+
+        print(f"[pipeline] All done!")
     else:
         print(f"[pipeline] Done! Video at: {output_video}")
 

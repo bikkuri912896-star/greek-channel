@@ -35,6 +35,8 @@ jobs:
           echo '${{ secrets.YOUTUBE_CLIENT_SECRETS }}' > client_secrets.json
           echo '${{ secrets.YOUTUBE_TOKEN }}'          > youtube_token.json
           printf 'ANTHROPIC_API_KEY=%s\n' '${{ secrets.ANTHROPIC_API_KEY }}' > .env
+          printf 'INSTAGRAM_ACCESS_TOKEN=%s\n' '${{ secrets.INSTAGRAM_ACCESS_TOKEN }}' >> .env
+          printf 'INSTAGRAM_ACCOUNT_ID=%s\n' '${{ secrets.INSTAGRAM_ACCOUNT_ID }}' >> .env
 
       - name: Generate and upload video
         run: python main.py
