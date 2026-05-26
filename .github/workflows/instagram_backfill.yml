@@ -1,0 +1,45 @@
+name: Instagram Backfill
+
+on:
+  workflow_dispatch:  # 手動実行のみ
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 最大6時間
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up credentials
+        run: |
+          echo '${{ secrets.YOUTUBE_CLIENT_SECRETS }}' > client_secrets.json
+          echo '${{ secrets.YOUTUBE_TOKEN }}'          > youtube_token.json
+          printf 'ANTHROPIC_API_KEY=%s\n'        '${{ secrets.ANTHROPIC_API_KEY }}'        > .env
+          printf 'INSTAGRAM_ACCESS_TOKEN=%s\n'   '${{ secrets.INSTAGRAM_ACCESS_TOKEN }}'   >> .env
+          printf 'INSTAGRAM_ACCOUNT_ID=%s\n'     '${{ secrets.INSTAGRAM_ACCOUNT_ID }}'     >> .env
+          printf 'CLOUDINARY_CLOUD_NAME=%s\n'    '${{ secrets.CLOUDINARY_CLOUD_NAME }}'    >> .env
+          printf 'CLOUDINARY_API_KEY=%s\n'       '${{ secrets.CLOUDINARY_API_KEY }}'       >> .env
+          printf 'CLOUDINARY_API_SECRET=%s\n'    '${{ secrets.CLOUDINARY_API_SECRET }}'    >> .env
+
+      - name: Run Instagram backfill
+        run: python instagram_backfill.py
+        env:
+          PYTHONIOENCODING: utf-8
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
