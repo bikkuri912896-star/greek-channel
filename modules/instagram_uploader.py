@@ -25,13 +25,15 @@ def upload_reel(video_path: Path, script: dict) -> str:
     print("[instagram] Creating media container...")
     resp = requests.post(
         f"{GRAPH_URL}/{user_id}/media",
-        params={
+        data={
             "media_type":  "REELS",
             "upload_type": "resumable",
             "caption":     caption,
             "access_token": token,
         }
     )
+    if not resp.ok:
+        print(f"[instagram] Error response: {resp.text}")
     resp.raise_for_status()
     data = resp.json()
     container_id = data["id"]
