@@ -10,9 +10,8 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-if hasattr(sys.stdout, "buffer"):
+if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-if hasattr(sys.stderr, "buffer"):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 import config
