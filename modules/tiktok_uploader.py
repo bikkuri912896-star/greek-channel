@@ -52,26 +52,19 @@ def upload_video(video_path: Path, script: dict) -> str:
 
     file_size = video_path.stat().st_size
 
-    # Step 1: 動画アップロードの初期化
-    print("[tiktok] Initializing video upload...")
+    # Step 1: 動画アップロードの初期化（下書きとして送信）
+    print("[tiktok] Initializing video upload (draft mode)...")
     init_resp = requests.post(
-        f"{TIKTOK_API}/post/publish/video/init/",
+        f"{TIKTOK_API}/post/publish/inbox/video/init/",
         headers={
             "Authorization": f"Bearer {access_token}",
             "Content-Type":  "application/json; charset=UTF-8",
         },
         json={
-            "post_info": {
-                "title":        caption,
-                "privacy_level": "SELF_ONLY",  # テスト中はSELF_ONLYで投稿
-                "disable_duet":    False,
-                "disable_comment": False,
-                "disable_stitch":  False,
-            },
             "source_info": {
-                "source":         "FILE_UPLOAD",
-                "video_size":     file_size,
-                "chunk_size":     file_size,
+                "source":            "FILE_UPLOAD",
+                "video_size":        file_size,
+                "chunk_size":        file_size,
                 "total_chunk_count": 1,
             },
         },
