@@ -9,6 +9,7 @@ from pathlib import Path
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
+import os
 import config
 from modules.script_generator import generate_script, TOPIC_POOL
 from modules.tts_generator import generate_scene_audios
@@ -17,6 +18,7 @@ from modules.video_creator import create_video
 from modules.bgm_generator import generate_ambient_bgm
 from modules.youtube_uploader import upload_video
 from modules.instagram_uploader import upload_reel
+from modules.tiktok_uploader import upload_video as upload_tiktok
 
 
 def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool = False) -> dict:
@@ -92,6 +94,19 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
                 print(f"[pipeline] Instagram upload failed: {e}")
         else:
             print("[pipeline] Instagram token not set, skipping.")
+
+        # 7. Upload to TikTok
+        if os.environ.get("TIKTOK_ACCESS_TOKEN"):
+            print("[pipeline] Uploading to TikTok...")
+            try:
+                import os as _os
+                post_id = upload_tiktok(output_video, script)
+                result["tiktok_id"] = post_id
+                print(f"[pipeline] TikTok: {post_id}")
+            except Exception as e:
+                print(f"[pipeline] TikTok upload failed: {e}")
+        else:
+            print("[pipeline] TikTok token not set, skipping.")
 
         print(f"[pipeline] All done!")
     else:

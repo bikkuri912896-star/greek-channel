@@ -40,6 +40,10 @@ jobs:
           printf 'CLOUDINARY_CLOUD_NAME=%s\n' '${{ secrets.CLOUDINARY_CLOUD_NAME }}' >> .env
           printf 'CLOUDINARY_API_KEY=%s\n' '${{ secrets.CLOUDINARY_API_KEY }}' >> .env
           printf 'CLOUDINARY_API_SECRET=%s\n' '${{ secrets.CLOUDINARY_API_SECRET }}' >> .env
+          printf 'TIKTOK_CLIENT_KEY=%s\n' '${{ secrets.TIKTOK_CLIENT_KEY }}' >> .env
+          printf 'TIKTOK_CLIENT_SECRET=%s\n' '${{ secrets.TIKTOK_CLIENT_SECRET }}' >> .env
+          printf 'TIKTOK_ACCESS_TOKEN=%s\n' '${{ secrets.TIKTOK_ACCESS_TOKEN }}' >> .env
+          printf 'TIKTOK_REFRESH_TOKEN=%s\n' '${{ secrets.TIKTOK_REFRESH_TOKEN }}' >> .env
 
       - name: Generate and upload video
         run: python main.py
@@ -48,6 +52,10 @@ jobs:
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
 
       - name: Save updated topic list
         run: |
