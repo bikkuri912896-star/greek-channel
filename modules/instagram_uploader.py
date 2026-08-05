@@ -9,7 +9,7 @@ import cloudinary.uploader
 from pathlib import Path
 import config
 
-GRAPH_URL = "https://graph.instagram.com/v21.0"
+GRAPH_URL = "https://graph.facebook.com/v21.0"
 
 
 def _host_video(video_path: Path) -> str:
