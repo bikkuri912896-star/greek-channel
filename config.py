@@ -3,7 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).parent
-load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
+load_dotenv(dotenv_path=BASE_DIR / ".env", override=False)
 ASSETS_DIR = BASE_DIR / "assets"
 BGM_DIR = ASSETS_DIR / "bgm"
 CACHE_DIR = BASE_DIR / ".cache"
