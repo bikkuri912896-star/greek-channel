@@ -44,6 +44,10 @@ jobs:
           printf 'TIKTOK_CLIENT_SECRET=%s\n' '${{ secrets.TIKTOK_CLIENT_SECRET }}' >> .env
           printf 'TIKTOK_ACCESS_TOKEN=%s\n' '${{ secrets.TIKTOK_ACCESS_TOKEN }}' >> .env
           printf 'TIKTOK_REFRESH_TOKEN=%s\n' '${{ secrets.TIKTOK_REFRESH_TOKEN }}' >> .env
+          printf 'TWITTER_API_KEY=%s\n' '${{ secrets.TWITTER_API_KEY }}' >> .env
+          printf 'TWITTER_API_SECRET=%s\n' '${{ secrets.TWITTER_API_SECRET }}' >> .env
+          printf 'TWITTER_ACCESS_TOKEN=%s\n' '${{ secrets.TWITTER_ACCESS_TOKEN }}' >> .env
+          printf 'TWITTER_ACCESS_TOKEN_SECRET=%s\n' '${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}' >> .env
 
       - name: Generate and upload video
         run: python main.py
@@ -58,6 +62,10 @@ jobs:
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 
       - name: Save updated topic list
         run: |

@@ -19,6 +19,7 @@ from modules.bgm_generator import generate_ambient_bgm
 from modules.youtube_uploader import upload_video
 from modules.instagram_uploader import upload_reel
 from modules.tiktok_uploader import upload_video as upload_tiktok
+from modules.twitter_uploader import post_tweet
 
 
 def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool = False) -> dict:
@@ -107,6 +108,17 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
                 print(f"[pipeline] TikTok upload failed: {e}")
         else:
             print("[pipeline] TikTok token not set, skipping.")
+
+        # 8. Post to Twitter/X
+        if os.environ.get("TWITTER_API_KEY") and result.get("youtube_url"):
+            print("[pipeline] Posting to Twitter/X...")
+            try:
+                tweet_id = post_tweet(script, result["youtube_url"])
+                result["tweet_id"] = tweet_id
+            except Exception as e:
+                print(f"[pipeline] Twitter post failed: {e}")
+        else:
+            print("[pipeline] Twitter credentials not set, skipping.")
 
         print(f"[pipeline] All done!")
     else:
