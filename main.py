@@ -110,10 +110,10 @@ def run_pipeline(topic: dict | None = None, upload: bool = True, dry_run: bool =
             print("[pipeline] TikTok token not set, skipping.")
 
         # 8. Post to Twitter/X
-        if os.environ.get("TWITTER_API_KEY") and result.get("youtube_url"):
+        if os.environ.get("TWITTER_API_KEY"):
             print("[pipeline] Posting to Twitter/X...")
             try:
-                tweet_id = post_tweet(script, result["youtube_url"])
+                tweet_id = post_tweet(script, str(output_video))
                 result["tweet_id"] = tweet_id
             except Exception as e:
                 print(f"[pipeline] Twitter post failed: {e}")
