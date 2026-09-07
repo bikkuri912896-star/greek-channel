@@ -16,7 +16,6 @@ def post_tweet(script: dict, video_path: str) -> str:
     print("[twitter] 動画をアップロード中...")
     media = api.media_upload(
         filename=video_path,
-        media_type="video/mp4",
         chunked=True,
         wait_for_async_finalize=True,
     )
